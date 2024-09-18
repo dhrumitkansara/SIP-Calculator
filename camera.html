@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!DOCTYPE html>
+    <html lang="en-US">
+    <head>
+    <meta charset="UTF-8">
+    <title>Mutual Fund Sahi hai</title>
+    <meta name="description" content="Mutual Fund Sahi hai"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    <!-- Stylesheets -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/select2.min.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
+    
+    
+    
+    <!-- Add site Favicon -->
+    <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <meta name="msapplication-TileImage" content="images/favicon.png" />
+    <title>Camera Capture</title>
+    <style>
+      #video {
+        width: 100%;
+        height: 500px;
+      }
+      #canvas {
+        display: none;
+      }
+      .frame {
+        border: 4px solid rgb(202, 56, 56);
+        width: 70%;
+        height: 400px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .body {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+      }
+      .camera-bg{    background: url(./images/backgrouns.jpg);
+        min-height: calc(100vh - 89px);
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;     align-items: center;
+    display: flex;
+    flex-direction: column; vertical-align: middle; padding-top: 0vh;}
+    </style>
+  </head>
+  <body class="body overflow-h">
+    <header class="main-header">
+    	
+    	<!-- Header Upper -->
+        <div class="header-upper">
+        	<div class="outer-container">
+            	<div class="inner-container clearfix">
+                	
+                	<div class="pull-left logo-box">
+                    	<div class="logo"><a href="index.html"><img src="images/bhaarat-nivesh-yatra.svg" alt="" title=""></a></div>
+                    </div>
+			
+                   
+					
+					<!-- Outer Box -->
+					<div class="outer-box clearfix pull-right logo-box">
+					
+						<!-- Mobile Navigation Toggler -->
+						<div class="logo"><a href="index.html"><img src="images/mutual-fund-sahi-hai.svg" alt="" title=""></a></div>
+					</div>
+                   
+                </div>
+            </div>
+        </div>
+        <!--End Header Upper-->
+        
+		<!-- Mobile Menu  -->
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn"><span class="icon lnr lnr-cross"></span></div>
+            
+            <nav class="menu-box">
+                <div class="nav-logo"><a href="index.html"><img src="images/logo-2.png" alt="" title=""></a></div>
+                <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
+            </nav>
+        </div><!-- End Mobile Menu -->
+		
+    </header>
+    <div class="camera-bg">
+      <div class="auto-container padd-70 text-center">
+        <h3 class="white-text">Align your face within the frame and click the capture button</h3>
+
+        <div style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; align-self: start;">
+          <video id="video" autoplay></video>
+          <div class="frame"></div>
+        </div>
+    
+        <button id="capture" class="theme-btn btn-style-one ">Capture Photo</button>
+        <canvas id="canvas"></canvas>
+      </div>
+
+</div>
+    <script>
+      const video = document.getElementById("video");
+      const canvas = document.getElementById("canvas");
+      const captureButton = document.getElementById("capture");
+      const context = canvas.getContext("2d");
+
+      // Request access to the camera
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((err) => {
+          console.error("Error accessing camera: " + err);
+        });
+
+      // Capture the photo and submit the form when the button is clicked
+      captureButton.addEventListener("click", () => {
+        // Set the canvas dimensions to the video size
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw the video frame onto the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert the canvas to a data URL (base64 image)
+        canvas.toBlob((blob) => {
+          // Retrieve form data from localStorage
+          const formData = JSON.parse(localStorage.getItem("formData"));
+
+          // Submit the data to the API along with the Blob image
+          submitData(formData, blob);
+        }, "image/png");
+        const formData = JSON.parse(localStorage.getItem("formData"));
+        // Submit the data to the API
+        submitData(formData, imageData);
+
+        // Stop the video stream after capturing
+        video.srcObject.getTracks().forEach((track) => track.stop());
+
+        // Optionally display the captured image
+        canvas.style.display = "block";
+      });
+
+      function submitData(formData, imageData) {
+        // Create a new FormData object to submit via POST
+        const data = new FormData();
+        data.append("fullName", formData.fullName);
+        data.append("city", formData.city);
+        data.append("state", formData.state);
+        data.append("email", formData.email);
+        data.append("gender", formData.gender);
+        data.append("dob", formData.dob);
+        data.append("contactNumber", formData.contactNumber);
+        data.append("image", imageData, "photo.png"); // Image data as base64
+        for (let pair of data.entries()) {
+          console.log(`${pair[0]}: ${pair[1]}`);
+        } 
+        // Send the POST request to the API
+        fetch("https://192.168.1.161:5001/api/bny/general", {
+          method: "POST",
+          body: data,
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            console.log("Success:", result);
+            alert("Form submitted successfully!");
+            window.location.replace("./registration.html")
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Form submission failed!");
+          });
+      }
+    </script>
+  </body>
+</html>

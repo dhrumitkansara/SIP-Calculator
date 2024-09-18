@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mutual Fund Sahi hai</title>
+  <meta name="description" content="Mutual Fund Sahi hai" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="profile" href="https://gmpg.org/xfn/11" />
+  <link rel="canonical" href="Replace_with_your_PAGE_URL" />
+
+  <!-- Stylesheets -->
+  <link href="css/bootstrap.min.css" rel="stylesheet" />
+  <link href="css/main.css" rel="stylesheet" />
+  <link href="css/responsive.css" rel="stylesheet" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Heebo:wght@100;300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Add site Favicon -->
+  <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="images/favicon.png" type="image/x-icon" />
+  <meta name="msapplication-TileImage" content="images/favicon.png" />
+
+</head>
+
+<body class="overflow-h">
+  <div class="page-wrapper">
+    <!-- Main Header-->
+    <header class="main-header">
+      <!-- Header Upper -->
+      <div class="header-upper">
+        <div class="outer-container">
+          <div class="inner-container clearfix">
+            <div class="pull-left logo-box">
+              <div class="logo">
+                <a href="index.html"><img src="images/bhaarat-nivesh-yatra.svg" alt="" title="" /></a>
+              </div>
+            </div>
+
+            <!-- Outer Box -->
+            <div class="outer-box clearfix pull-right logo-box">
+              <!-- Mobile Navigation Toggler -->
+              <div class="logo">
+                <a href="index.html"><img src="images/mutual-fund-sahi-hai.svg" alt="" title="" /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--End Header Upper-->
+
+      <!-- Mobile Menu  -->
+      <div class="mobile-menu">
+        <div class="menu-backdrop"></div>
+        <div class="close-btn"><span class="icon lnr lnr-cross"></span></div>
+
+        <nav class="menu-box">
+          <div class="nav-logo">
+            <a href="index.html"><img src="images/logo-2.png" alt="" title="" /></a>
+          </div>
+          <div class="menu-outer">
+            <!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+          </div>
+        </nav>
+      </div>
+      <!-- End Mobile Menu -->
+    </header>
+    <!--End Main Header -->
+
+    <section class="contact-page-section bg-image">
+      <div class="auto-container bg-color padd-70">
+        <div class="row clearfix">
+          <!-- Form Column -->
+          <div class="form-column col-lg-12 col-md-12 col-sm-12">
+            <div class="form-column flex language-dropdown mr-2">
+              <div class="dropdown select-language-drop">
+                <label for="language" class="form-label">Select Language</label>
+                <select class="form-select" id="language" name="language" required>
+                  <option disabled value="">
+                    Choose a language
+                  </option>
+                  <option selected value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="zh">Chinese</option>
+                  <option value="jp">Japanese</option>
+                </select>
+              </div>
+            </div>
+            <div class="inside-box max-box-630">
+              <div class="small-banner">
+                <img src="images/bhaarat-nivesh-yatra-small-banner.jpg" />
+              </div>
+              <div class="inner-column">
+                <h4 class="text-center green-text hello-name" id="greeting-text"></h4>
+                <div class="divider"></div>
+                <p class="black-text padd-20 f-500 mb-0">
+                  Welcome to Bharat Nivesh Yatra: An ‘On-the-Wheels'
+                  initiative to create awareness <br />
+                  about Mutual Funds. <br />
+                  We are here to take you on a journey to explore the world of
+                  Mutual Funds and <br />help you understand the importance of
+                  investing for your goals.
+                </p>
+
+                <div class="divider"></div>
+                <a href="/video.html">
+                  <div class="btn-style-three">
+                    Start your Journey
+                  </div>
+                </a>
+              </div>
+              <span id="countdown"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--End pagewrapper-->
+
+  <!-- Scroll To Top -->
+  <div class="scroll-to-top scroll-to-target" data-target="html">
+    <span class="fa fa-arrow-circle-up"></span>
+  </div>
+
+  <script src="js/jquery.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+  <script src="js/jquery.fancybox.js"></script>
+  <script src="js/appear.js"></script>
+  <script src="js/owl.js"></script>
+  <script src="js/wow.js"></script>
+  <script src="js/parallax.min.js"></script>
+  <script src="js/tilt.jquery.min.js"></script>
+  <script src="js/jquery.paroller.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    function startTimer(duration, display) {
+      let timer = duration,
+        minutes,
+        seconds;
+      let intervalId = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+          clearInterval(intervalId);
+          timer = 0;
+          display.textContent = "The timer has run out!";
+        }
+      }, 1000);
+
+      return intervalId;
+    }
+
+    window.onload = function () {
+      let intervalId;
+
+      window.onload = function () {
+        let duration = 45;
+        let display = document.querySelector("#countdown");
+
+        // Start the initial timer
+        intervalId = startTimer(duration, display);
+
+        window.onclick = function () {
+
+
+          // Clear the old timer before starting a new one
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+
+          // Reset the timer
+          intervalId = startTimer(duration, display);
+        };
+      };
+
+      document.getElementById('greeting-text').innerHTML = `Hello ${localStorage.getItem('userName')}`
+    };
+  </script>
+</body>
+
+</html>

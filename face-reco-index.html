@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Authentication</title>
+    <!-- Stylesheets -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/select2.min.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
+
+    <style>
+        /* body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; } */
+        canvas {
+            display: block;
+        }
+
+        /* Hide canvas by default */
+        #message {
+            font-size: 1.2em;
+        }
+
+        .camera-bg {
+            background: url(./images/backgrouns.jpg);
+            min-height: calc(100vh - 89px);
+            width: 100%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            vertical-align: middle;
+            padding-top: 0vh;
+        }
+    </style>
+</head>
+
+<body class="body overflow-h">
+    <header class="main-header">
+
+        <!-- Header Upper -->
+        <div class="header-upper">
+            <div class="outer-container">
+                <div class="inner-container clearfix">
+
+                    <div class="pull-left logo-box">
+                        <div class="logo"><a href="index.html"><img src="images/bhaarat-nivesh-yatra.svg" alt=""
+                                    title=""></a></div>
+                    </div>
+
+
+
+                    <!-- Outer Box -->
+                    <div class="outer-box clearfix pull-right logo-box">
+
+                        <!-- Mobile Navigation Toggler -->
+                        <div class="logo"><a href="index.html"><img src="images/mutual-fund-sahi-hai.svg" alt=""
+                                    title=""></a></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--End Header Upper-->
+
+        <!-- Mobile Menu  -->
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn"><span class="icon lnr lnr-cross"></span></div>
+
+            <nav class="menu-box">
+                <div class="nav-logo"><a href="index.html"><img src="images/logo-2.png" alt="" title=""></a></div>
+                <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header-->
+                </div>
+            </nav>
+        </div><!-- End Mobile Menu -->
+
+    </header>
+    <div class="camera-bg">
+        <div class="auto-container padd-70 text-center">
+            <h3 class="white-text mb-30">
+                Please Look at the Camera&nbsp;&nbsp; <i class="fas fa-arrow-up"></i></h1>
+
+                </span>
+                <canvas id="canvas"></canvas>
+                <div id="message" class="text-center mb-30 mt-30 white-text title-text-head"></div>
+        </div>
+    </div>
+    <span>
+
+        <script type="text/javascript" src="./public/tfjs.js"></script>
+        <script type="text/javascript" src="./public/blazeface.js"></script>
+        <script src="js/config.js" type="module"></script>
+        <script>
+            const video = document.createElement('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            const message = document.getElementById('message');
+            let model;
+            let isProcessing = false;
+            let stopDetection = false;
+            let lastRequestTime = 0;
+            const requestDelay = 20000; // 20 seconds delay between requests
+
+            async function loadModel() {
+                model = await blazeface.load();
+                startVideo();
+            }
+
+            function startVideo() {
+                navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.play();
+                        detectFaces();
+                    })
+                    .catch(error => {
+                        console.error('Error accessing media devices.', error);
+                        message.innerHTML = 'Error accessing camera.';
+                    });
+            }
+
+            async function detectFaces() {
+                if (stopDetection || isProcessing) return;
+                requestAnimationFrame(detectFaces);
+
+                const now = Date.now();
+                if (now - lastRequestTime < requestDelay) return; // Enforce delay between requests
+
+                isProcessing = true;
+                try {
+                    const predictions = await model.estimateFaces(video, false);
+                    if (predictions.length > 0) {
+                        const face = predictions[0];
+                        const faceWidth = face.bottomRight[0] - face.topLeft[0];
+                        const faceHeight = face.bottomRight[1] - face.topLeft[1];
+                        const faceArea = faceWidth * faceHeight;
+                        const frameArea = video.videoWidth * video.videoHeight;
+
+                        if (faceArea > frameArea * 0.1 && face.probability[0] > 0.95) {
+                            sendFrame();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error detecting faces:', error);
+                } finally {
+                    isProcessing = false;
+                }
+            }
+
+            async function fetchUserData() {
+                const userIdentifier = localStorage.getItem('userIdentifier');
+                try {
+                    await fetch(`${window.baseUrl}/bny/id/${userIdentifier}`)
+                        .then(userResponse => userResponse.json())
+                        .then(userData => {
+                            localStorage.setItem('userId', userData?._id);
+                            localStorage.setItem('userName', userData?.fullName);
+
+                            initiateJourney();
+                        });
+                } catch (error) {
+                    console.error("Error fetching user's data: ", error)
+                }
+            }
+
+            async function initiateJourney() {
+                const userId = localStorage.getItem('userId');
+                try {
+                    await fetch(`${window.baseUrl}/user-analytics/journey-started/${userId}`)
+                        .then(journeyResponse => journeyResponse.json())
+                        .then(journeyData => {
+                            window.location.replace('./hello.html');
+                        });
+                } catch (error) {
+                    console.error("Error initiating user journey", error)
+                }
+            }
+
+            function sendFrame() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    const formData = new FormData();
+                    formData.append('image', blob);
+
+                    fetch('http://192.168.1.161:8082/detect_faces', { method: 'POST', body: formData })
+                        .then(response => response.json())
+                        .then(data => {
+                            lastRequestTime = Date.now(); // Update the time of the last request
+                            const detected = data[0];
+                            detected.name = 2;
+                            if (detected.name !== "Unknown") {
+                                localStorage.setItem("userIdentifier", detected?.name);
+                                stopDetection = true;
+                                video.srcObject.getTracks().forEach(track => track.stop());
+                                message.innerHTML = `Thanks for logging in, ${detected.name}.`;
+                                fetchUserData();
+                            } else {
+                                message.innerHTML = 'Face not recognized. Please try again.';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            message.innerHTML = 'An error occurred during authentication.';
+                        });
+                }, 'image/jpeg');
+            }
+
+            loadModel();
+        </script>
+</body>
+
+</html>
