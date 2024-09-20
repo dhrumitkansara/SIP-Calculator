@@ -106,7 +106,7 @@
                                         <input type="number" id="output3" class="goal-sip-amt" value="12" />
                                     </div>
                                     <div class="col-md-12">
-                                        <input type="range" min="1" max="12" value="0.5"
+                                        <input type="range" min="3" max="15" value="0.5"
                                             class="form-control-range range-slider" id="slider3">
                                     </div>
                                 </div>
@@ -171,15 +171,24 @@
 
         let intervalId;
 
-        function setupSlider(sliderId, outputId) {
+        function setupSlider(sliderId, outputId, min, max) {
             var slider = document.getElementById(sliderId);
             var output = document.getElementById(outputId);
             output.value = slider.value;
+
+            // Update slider on input from the field
             slider.oninput = function () {
                 output.value = this.value;
                 calculateSIP();
             };
+
+            // Validate output field and update slider
             output.oninput = function () {
+                let val = parseFloat(this.value);
+                if (val < min || val > max) {
+                    alert(`Please enter a value between ${min} and ${max}`);
+                    this.value = val < min ? min : max;
+                }
                 slider.value = this.value;
                 calculateSIP();
             };
@@ -199,21 +208,20 @@
                 document.getElementById('maturityAmount').innerText = "₹" + maturityAmount.toFixed(2);
                 document.getElementById('totalInvestment').innerText = "₹" + totalInvestment.toFixed(2);
                 document.getElementById('investment-summary').innerHTML = `
-                <span>
-                    If you invest <span class="amt-text-1">₹${P}</span> for next <span class="amt-text-1">${n / 12} years</span>, you will accumulate <span class="amt-text-2">₹${totalInvestment.toFixed(2)}</span>
-                </span>
+                    <span>
+                        If you invest <span class="amt-text-1">₹${P}</span> for the next <span class="amt-text-1">${n / 12} years</span>, you will accumulate <span class="amt-text-2">₹${totalInvestment.toFixed(2)}</span>
+                    </span>
                 `;
             } else {
                 document.getElementById('maturityAmount').innerText = "₹0.00";
                 document.getElementById('totalInvestment').innerText = "₹0.00";
             }
-
         }
 
-        // Set up each slider
-        setupSlider('slider1', 'output1');
-        setupSlider('slider2', 'output2');
-        setupSlider('slider3', 'output3');
+        // Set up each slider with the respective min/max values
+        setupSlider('slider1', 'output1', 500, 500000);
+        setupSlider('slider2', 'output2', 1, 50);
+        setupSlider('slider3', 'output3', 3, 15);
 
         // Initial SIP calculation
         calculateSIP();
@@ -279,7 +287,6 @@
 
             window.onclick = function () {
 
-
                 // Clear the old timer before starting a new one
                 if (intervalId) {
                     clearInterval(intervalId);
@@ -290,7 +297,6 @@
             };
 
             setGoalSelected();
-
         };
     </script>
 </body>

@@ -105,7 +105,7 @@
                                         <input type="number" id="output3" class="goal-sip-amt" value="12" />
                                     </div>
                                     <div class="col-md-12">
-                                        <input type="range" min="1" max="12" value="0.5"
+                                        <input type="range" min="3" max="15" value="0.5"
                                             class="form-control-range range-slider" id="slider3">
                                     </div>
                                 </div>
@@ -168,15 +168,24 @@
         import { startTimer } from "../js/helper.js";
         let intervalId;
 
-        function setupSlider(sliderId, outputId) {
+        function setupSlider(sliderId, outputId, min, max) {
             var slider = document.getElementById(sliderId);
             var output = document.getElementById(outputId);
             output.value = slider.value;
+
+            // Update slider on input from the field
             slider.oninput = function () {
                 output.value = this.value;
                 calculateSIP();
             };
+
+            // Validate output field and update slider
             output.oninput = function () {
+                let val = parseFloat(this.value);
+                if (val < min || val > max) {
+                    alert(`Please enter a value between ${min} and ${max}`);
+                    this.value = val < min ? min : max;
+                }
                 slider.value = this.value;
                 calculateSIP();
             };
@@ -205,10 +214,10 @@
             }
         }
 
-        // Set up each slider
-        setupSlider('slider1', 'output1');
-        setupSlider('slider2', 'output2');
-        setupSlider('slider3', 'output3');
+        // Set up each slider with the respective min/max values
+        setupSlider('slider1', 'output1', 500, 500000);
+        setupSlider('slider2', 'output2', 1, 50);
+        setupSlider('slider3', 'output3', 3, 15);
 
         // Initial SIP calculation
         calculateSIP();
