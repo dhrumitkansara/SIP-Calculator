@@ -1,4 +1,4 @@
-export function startTimer(duration, display) {
+export function startTimer(duration, display, step) {
     let timer = duration,
         minutes,
         seconds;
@@ -17,7 +17,7 @@ export function startTimer(duration, display) {
             clearInterval(intervalId);
             timer = 0;
             display.textContent = "The timer has run out!";
-            fetch(`${window.baseUrl}/user-analytics/journey-ended/${userId}`).then(response => window.location.replace('./start-experience.html'));
+            fetch(`${window.baseUrl}/user-analytics/journey-ended/${userId}/${step}`).then(response => window.location.replace('./start-experience.html'));
         }
     }, 1000);
 

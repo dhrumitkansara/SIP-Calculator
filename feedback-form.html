@@ -280,6 +280,7 @@
           clearInterval(intervalId);
           timer = 0;
           display.textContent = "The timer has run out!";
+          fetch(`${window.baseUrl}/user-analytics/journey-ended/${userId}/${step}`).then(response => window.location.replace('./start-experience.html'));
         }
       }, 1000);
 
@@ -293,7 +294,7 @@
 
       window.onclick = function () {
         clearInterval(intervalId);
-        intervalId = startTimer(duration, display);
+        intervalId = startTimer(duration, display, 5);
       };
     };
   </script>

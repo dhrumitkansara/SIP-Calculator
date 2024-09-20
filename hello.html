@@ -142,7 +142,7 @@
   <script src="js/jquery-ui.js"></script>
   <script src="js/script.js"></script>
   <script>
-    function startTimer(duration, display) {
+    function startTimer(duration, display, step) {
       let timer = duration,
         minutes,
         seconds;
@@ -159,6 +159,7 @@
           clearInterval(intervalId);
           timer = 0;
           display.textContent = "The timer has run out!";
+          fetch(`${window.baseUrl}/user-analytics/journey-ended/${userId}/${step}`).then(response => window.location.replace('./start-experience.html'));
         }
       }, 1000);
 
@@ -184,7 +185,7 @@
           }
 
           // Reset the timer
-          intervalId = startTimer(duration, display);
+          intervalId = startTimer(duration, display, 1);
         };
       };
 
