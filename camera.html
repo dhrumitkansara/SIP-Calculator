@@ -92,7 +92,6 @@
       </div>
     </div>
     <!--End Header Upper-->
-
     <!-- Mobile Menu  -->
     <div class="mobile-menu">
       <div class="menu-backdrop"></div>
@@ -127,65 +126,69 @@
     const captureButton = document.getElementById("capture");
     const flipCameraButton = document.getElementById("flip-camera");
     const context = canvas.getContext("2d");
+    let stream;
 
-    // Request access to the camera
-    navigator.mediaDevices
-      .getUserMedia({ video: { facingMode } })
-      .then((stream) => {
-        video.srcObject = stream;
-      })
-      .catch((err) => {
-        console.error("Error accessing camera: " + err);
-      });
-
-    flipCameraButton.addEventListener("click", () => {
-      if (facingMode === 'user') {
-        facingMode = 'environment';
-      } else {
-        facingMode = 'user';
+    function stopStream() {
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
       }
+    }
 
-      // Request access to the camera with the new facing mode
+
+    function startCamera() {
+      stopStream();
+
       navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: facingMode } })
-        .then((stream) => {
+        .getUserMedia({ video: { facingMode } })
+        .then((newStream) => {
+          stream = newStream;
           video.srcObject = stream;
         })
         .catch((err) => {
           console.error("Error accessing camera: " + err);
         });
+    }
+
+
+    startCamera();
+
+
+    flipCameraButton.addEventListener("click", () => {
+      facingMode = (facingMode === 'user') ? 'environment' : 'user';
+      startCamera();
     });
 
-    // Capture the photo and submit the form when the button is clicked
+
     captureButton.addEventListener("click", () => {
-      // Set the canvas dimensions to the video size
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      // Draw the video frame onto the canvas
+
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Convert the canvas to a data URL (base64 image)
+
       canvas.toBlob((blob) => {
-        // Retrieve form data from localStorage
+
         const formData = JSON.parse(localStorage.getItem("formData"));
 
-        // Submit the data to the API along with the Blob image
+
         submitData(formData, blob);
       }, "image/png");
       const formData = JSON.parse(localStorage.getItem("formData"));
-      // Submit the data to the API
+
       submitData(formData, imageData);
 
-      // Stop the video stream after capturing
+
       video.srcObject.getTracks().forEach((track) => track.stop());
 
-      // Optionally display the captured image
+
       canvas.style.display = "block";
     });
 
     function submitData(formData, imageData) {
-      // Create a new FormData object to submit via POST
+
       const data = new FormData();
       data.append("fullName", formData.fullName);
       data.append("city", formData.city);
@@ -194,11 +197,11 @@
       data.append("gender", formData.gender);
       data.append("dob", formData.dob);
       data.append("contactNumber", formData.contactNumber);
-      data.append("image", imageData, "photo.png"); // Image data as base64
+      data.append("image", imageData, "photo.png");
       for (let pair of data.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
-      // Send the POST request to the API
+
       fetch("https://192.168.1.161:5001/api/bny/general", {
         method: "POST",
         body: data,
