@@ -185,7 +185,17 @@
             output.oninput = function () {
                 let val = parseFloat(this.value);
                 if (val < min || val > max) {
-                    alert(`Please enter a value between ${min} and ${max}`);
+                    switch (sliderId) {
+                        case 'slider1':
+                            alert(`You have not entered the correct goal amount.`);
+                            break;
+                        case 'slider2':
+                            alert(`You have not entered the correct investment duration.`);
+                            break;
+                        default:
+                            alert(`Please ensure that the expected rate of return is within the range of 3-15%.`);
+                            break;
+                    }
                     this.value = val < min ? min : max;
                 }
                 slider.value = this.value;

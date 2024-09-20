@@ -193,7 +193,6 @@
                         .then(data => {
                             lastRequestTime = Date.now(); // Update the time of the last request
                             const detected = data[0];
-                            detected.name = 2;
                             if (detected.name !== "Unknown") {
                                 localStorage.setItem("userIdentifier", detected?.name);
                                 stopDetection = true;
