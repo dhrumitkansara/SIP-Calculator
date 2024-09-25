@@ -176,10 +176,6 @@
 
         submitData(formData, blob);
       }, "image/png");
-      const formData = JSON.parse(localStorage.getItem("formData"));
-
-      submitData(formData, imageData);
-
 
       video.srcObject.getTracks().forEach((track) => track.stop());
 
@@ -188,7 +184,6 @@
     });
 
     function submitData(formData, imageData) {
-
       const data = new FormData();
       data.append("fullName", formData.fullName);
       data.append("city", formData.city);
